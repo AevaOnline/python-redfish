@@ -18,7 +18,7 @@ STARTING ASSUMPTIONS
 
 On URIs:
 
-The RedFish RESTful API is a "hypermedia API" by design.  This is to avoid
+The Redfish RESTful API is a "hypermedia API" by design.  This is to avoid
 building in restrictive assumptions to the data model that will make it
 difficult to adapt to future hardware implementations.  A hypermedia API avoids
 these assumptions by making the data model discoverable via links between
@@ -128,10 +128,10 @@ import StringIO
 import sys
 
 
-class RedFishConnection(object):
+class RedfishConnection(object):
 
     def __init__(self):
-        super(RedFishConnection, self).__init__()
+        super(RedfishConnection, self).__init__()
         # XXX add members, we're going to have to cache
 
     def rest_op(self, operation, host, suburi, request_headers, request_body,
