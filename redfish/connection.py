@@ -130,8 +130,12 @@ import sys
 
 class RedfishConnection(object):
 
-    def __init__(self):
+    def __init__(self, host, iLO_loginname, iLO_password):
         super(RedfishConnection, self).__init__()
+        self.host = host
+        self.iLO_loginname = iLO_loginname
+        self.iLO_password = iLO_password
+
         # XXX add members, we're going to have to cache
 
     def _op(self, operation, host, suburi, request_headers, request_body,
