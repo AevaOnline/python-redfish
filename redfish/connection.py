@@ -296,7 +296,7 @@ class RedfishConnection(object):
             request_headers = dict()
         request_headers['Content-Type'] = 'application/json'
         # NOTE:  don't assume any newly created resource is included in the
-        # # response.  Only the Location header matters.
+        # response.  Only the Location header matters.
         # the response body may be the new resource, it may be an
         # ExtendedError, or it may be empty.
         return self._op('POST', suburi, request_headers, request_body)
