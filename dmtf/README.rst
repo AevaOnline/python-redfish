@@ -2,7 +2,8 @@ DMTF Redfish specification
 --------------------------
 
 This directory contains the current references from the DMTF on the Redfish 
-specification (0.9.6 at the time of the writing)
+specification (1.0.0 at the time of the writing)
+
 In order to ease test, the DMTF has published a mockup environment to simulate 
 a Redfish based system so it is possible to write programs without real Redfish 
 compliant hardware platform.
@@ -16,7 +17,7 @@ a docker registry) which will create a docker container running the DMTF Redfish
 mockup on the port 8000.
 
 To build your container, just issue:  ./buildImage.sh
-To launch it, just issue: run-redfish-simulator.sh
+To launch it, just issue: ./run-redfish-simulator.sh
 To use it, just issue: firefox http://localhost:8000/redfish/v1
 
 Systems entry point:
