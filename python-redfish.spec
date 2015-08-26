@@ -7,7 +7,7 @@ Summary:        Redfish python library
 
 Group:          Development/Python
 License:        Apache v2.0
-URL:            https://github.com/devananda/python-redfish
+URL:            https://github.com/devananda/%{name}
 Source0:        %name-%version.tar.gz
 
 BuildArch:      noarch
@@ -28,8 +28,9 @@ system such as defined by http://www.redfishcertification.org
 %install
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 
-# TODO: Add examples
 %files
+%doc README.rst examples/*.py
 %dir %{python_sitelib}/redfish
-%{python_sitelib}/redfish/*
+%{python_sitelib}/redfish/*.py*
+%{python_sitelib}/redfish/tests/*.py*
 %{python_sitelib}/python_redfish*
