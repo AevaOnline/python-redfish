@@ -313,7 +313,7 @@ class RedfishConnection(object):
         # TODO : Manage exception with a class.
         # =======================================================================
         if auth.status_code != 201:
-            pass
+            raise exception.AuthenticationFailureException("Login request return an invalid status code")
             #sysraise "Error getting token", auth.status_code
 
         self.connection_parameters.auth_token = auth.headers.get("x-auth-token")
