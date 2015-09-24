@@ -186,7 +186,7 @@ class Systems(Base):
             # Hopefully this kind of discrepencies will be fixed with Redfish 1.0 (August)
             return self.data.BiosVersion
 
-    def get_serialnumber(self):
+    def get_serial_number(self):
         try:
             # Returned by proliant
             return self.data.SerialNumber
@@ -194,6 +194,18 @@ class Systems(Base):
             # Returned by mockup.
             # Hopefully this kind of discrepencies will be fixed with Redfish 1.0 (August)
             return ""
+        
+    def get_power(self):
+        try:
+            return self.data.Power
+        except:
+            return ""
+        
+    def get_parameter(self, parameter_name):
+        try:
+            return self.data[parameter_name]
+        except:
+            return "Parameter does not exist"
 
 
 class SystemsCollection(BaseCollection):

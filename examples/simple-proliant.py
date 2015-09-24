@@ -41,7 +41,9 @@ print ("Redfish API version : %s \n" % remote_mgmt.get_api_version())
 #        remote_mgmt.Systems.systems_list[0] = remote_mgmt.Systems.managed_system
 
 print("Bios version : {}\n".format(remote_mgmt.Systems.systems_list[0].get_bios_version()))
+print("Serial Number : {}\n".format(remote_mgmt.Systems.systems_list[0].get_serial_number()))
+print("Power State : {}\n".format(remote_mgmt.Systems.systems_list[0].get_power()))
+print("Parameter 'Model' : {}\n".format(remote_mgmt.Systems.systems_list[0].get_parameter("Model")))
 
-print("Serial Number : {}\n".format(remote_mgmt.Systems.systems_list[0].get_serialnumber()))
 
 remote_mgmt.logout()
