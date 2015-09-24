@@ -186,6 +186,15 @@ class Systems(Base):
             # Hopefully this kind of discrepencies will be fixed with Redfish 1.0 (August)
             return self.data.BiosVersion
 
+    def get_serialnumber(self):
+        try:
+            # Returned by proliant
+            return self.data.SerialNumber
+        except:
+            # Returned by mockup.
+            # Hopefully this kind of discrepencies will be fixed with Redfish 1.0 (August)
+            return ""
+
 
 class SystemsCollection(BaseCollection):
     """Class to manage redfish ManagersCollection data."""
