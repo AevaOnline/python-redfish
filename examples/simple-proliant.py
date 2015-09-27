@@ -6,6 +6,7 @@ import os
 import sys
 import json
 import redfish
+from time import sleep
 
 # Get $HOME environment.
 HOME = os.getenv('HOME')
@@ -43,7 +44,25 @@ print ("Redfish API version : %s \n" % remote_mgmt.get_api_version())
 print("Bios version : {}\n".format(remote_mgmt.Systems.systems_list[0].get_bios_version()))
 print("Serial Number : {}\n".format(remote_mgmt.Systems.systems_list[0].get_serial_number()))
 print("Power State : {}\n".format(remote_mgmt.Systems.systems_list[0].get_power()))
-print("Parameter 'Model' : {}\n".format(remote_mgmt.Systems.systems_list[0].get_parameter("Model")))
+print("Parameter 'SystemType' : {}\n".format(remote_mgmt.Systems.systems_list[0].get_parameter("SystemType")))
 
+print("Get bios parameters : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.get_parameters()))
+print("Get boot parameters : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.boot.get_parameters()))
+
+
+print("Get bios parameter 'AdminPhone' : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.get_parameter("AdminPhone")))
+print("Set bios parameter 'AdminPhone' to '' : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.set_parameter("AdminPhone","")))
+
+
+#Boot server with script
+#remote_mgmt.Systems.systems_list[0].bios.set_parameter("PreBootNetwork","Auto")
+#remote_mgmt.Systems.systems_list[0].bios.set_parameter("Dhcpv4","Enabled")
+
+#remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartup","Enabled")
+#remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupLocation","NetworkLocation")
+#remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupUrl","http://192.168.1.1/deploy/startup.nsh")
+
+
+#remote_mgmt.Systems.systems_list[0].reset_system()
 
 remote_mgmt.logout()

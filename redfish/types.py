@@ -6,6 +6,7 @@ import requests
 import tortilla
 import config
 import mapping
+import re
 
 # Global variable
 
@@ -162,6 +163,7 @@ class Systems(Base):
     #        Also to check with the ironic driver requirement.
     def __init__(self, url, connection_parameters):
         super(Systems, self).__init__(url, connection_parameters)
+        self.bios = Bios(url+"Bios/Settings", connection_parameters)
         
     def reset_system(self):
         # Craft the request
@@ -174,7 +176,7 @@ class Systems(Base):
         response = self.api_url.post(verify=self.connection_parameters.verify_cert,
                                      headers={'x-auth-token': self.connection_parameters.auth_token},
                                      data=action
-                                        )
+                                    )
         #TODO : treat response.
         
     def get_bios_version(self):
@@ -206,8 +208,7 @@ class Systems(Base):
             return self.data[parameter_name]
         except:
             return "Parameter does not exist"
-
-
+        
 class SystemsCollection(BaseCollection):
     """Class to manage redfish ManagersCollection data."""
     def __init__(self, url, connection_parameters):
@@ -217,8 +218,62 @@ class SystemsCollection(BaseCollection):
         
         for link in self.links:
             self.systems_list.append(Systems(link, connection_parameters))
-            
-            
+
+class Bios(Base):
+    def __init__(self, url, connection_parameters):
+        super(Bios, self).__init__(url, connection_parameters)
+        self.boot = Boot(re.findall(".+/Bios",url)[0]+"/Boot/Settings", connection_parameters)
+        
+    def get_parameters(self):
+        try:
+            return self.data
+        except:
+            return -1
+        
+    def get_parameter(self, parameter_name):
+        try:
+            return self.data[parameter_name]
+        except:
+            return "Parameter does not exist"
+     
+    def set_parameter(self, parameter_name, value):
+        # Craft the request
+        action = dict()
+        action[parameter_name] = value
+
+        # perform the POST action
+        print self.api_url
+        response = self.api_url.patch(verify=self.connection_parameters.verify_cert,
+                                     headers={'x-auth-token': self.connection_parameters.auth_token},
+                                     data=action
+                                    )
+class Boot(Base):
+    def __init__(self, url, connection_parameters):
+        super(Boot, self).__init__(url, connection_parameters)
+        
+    def get_parameters(self):
+        try:
+            return self.data
+        except:
+            return -1        
+    
+    def get_parameter(self, parameter_name):
+        try:
+            return self.data[parameter_name]
+        except:
+            return "Parameter does not exist"
+     
+    def set_parameter(self, parameter_name, value):
+        # Craft the request
+        action = dict()
+        action[parameter_name] = value
+
+        # perform the POST action
+        response = self.api_url.patch(verify=self.connection_parameters.verify_cert,
+                                     headers={'x-auth-token': self.connection_parameters.auth_token},
+                                     data=action
+                                    )
+    
 class EthernetInterfacesCollection(BaseCollection):
     def __init__(self, url, connection_parameters):
         super(EthernetInterfacesCollection, self).__init__(url, connection_parameters)
@@ -230,7 +285,6 @@ class EthernetInterfacesCollection(BaseCollection):
         # Check more than 1 hour for this bug.... grrr....
         for link in self.links:
             self.ethernet_interfaces_list.append(EthernetInterfaces(link, connection_parameters))
-
 
 class EthernetInterfaces(Base):
     pass
