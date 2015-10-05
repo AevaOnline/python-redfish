@@ -209,6 +209,29 @@ class Systems(Base):
         except:
             return "Parameter does not exist"
         
+    def set_parameter(self, parameter_name, value):
+        # Craft the request
+        action = dict()
+        action[parameter_name] = value
+        print(action)
+
+        # perform the POST action
+        print self.api_url
+        response = self.api_url.patch(verify=self.connection_parameters.verify_cert,
+                                     headers={'x-auth-token': self.connection_parameters.auth_token},
+                                     data=action
+                                     )     
+        
+    def set_parameter_json(self, value):
+        # perform the POST action
+        print self.api_url.url()
+                
+        response = requests.patch(self.api_url.url(),
+                                  verify=self.connection_parameters.verify_cert,
+                                  headers={'x-auth-token': self.connection_parameters.auth_token, 'Content-type': 'application/json'},
+                                  data=value)
+        print(response.reason)
+
 class SystemsCollection(BaseCollection):
     """Class to manage redfish ManagersCollection data."""
     def __init__(self, url, connection_parameters):

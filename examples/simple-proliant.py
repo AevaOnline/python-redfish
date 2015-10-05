@@ -50,19 +50,23 @@ print("Get bios parameters : {}\n".format(remote_mgmt.Systems.systems_list[0].bi
 print("Get boot parameters : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.boot.get_parameters()))
 
 
-print("Get bios parameter 'AdminPhone' : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.get_parameter("AdminPhone")))
-print("Set bios parameter 'AdminPhone' to '' : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.set_parameter("AdminPhone","")))
+#print("Get bios parameter 'AdminPhone' : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.get_parameter("AdminPhone")))
+#print("Set bios parameter 'AdminPhone' to '' : {}\n".format(remote_mgmt.Systems.systems_list[0].bios.set_parameter("AdminPhone","")))
 
 
 #Boot server with script
-#remote_mgmt.Systems.systems_list[0].bios.set_parameter("PreBootNetwork","Auto")
 #remote_mgmt.Systems.systems_list[0].bios.set_parameter("Dhcpv4","Enabled")
 
-#remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartup","Enabled")
-#remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupLocation","NetworkLocation")
-#remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupUrl","http://192.168.1.1/deploy/startup.nsh")
+remote_mgmt.Systems.systems_list[0].bios.set_parameter("PreBootNetwork", "Auto")
+remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartup", "Enabled")
+remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupLocation", "NetworkLocation")
+remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupUrl", "http://10.3.222.88/deploy/startup.nsh")
 
 
+remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideTarget": "UefiShell"}}')
+remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideEnabled" : "Once"}}')
+
+#Reset of the system is required to apply the changes
 #remote_mgmt.Systems.systems_list[0].reset_system()
 
 remote_mgmt.logout()
