@@ -62,11 +62,10 @@ remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartup", "Enab
 remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupLocation", "NetworkLocation")
 remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupUrl", "http://10.3.222.88/deploy/startup.nsh")
 
-
 remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideTarget": "UefiShell"}}')
 remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideEnabled" : "Once"}}')
 
 #Reset of the system is required to apply the changes
-#remote_mgmt.Systems.systems_list[0].reset_system()
+remote_mgmt.Systems.systems_list[0].reset_system()
 
 remote_mgmt.logout()

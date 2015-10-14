@@ -15,6 +15,7 @@ class Base(object):
     """Abstract class to manage types (Chassis, Servers etc...)."""
 
     def __init__(self, url, connection_parameters):
+        """Class constructor"""
         global TORTILLADEBUG
         self.connection_parameters = connection_parameters # Uggly hack to check
         self.url = url
@@ -91,7 +92,6 @@ class BaseCollection(Base):
 class Root(Base):
     """Class to manage redfish Root data."""
 
-
     def get_api_version(self):
         """Return api version.
 
@@ -109,6 +109,11 @@ class Root(Base):
         return(version)
 
     def get_api_UUID(self):
+        """Return UUID version.
+
+        :returns:  string -- UUID
+
+        """
         return self.data.UUID
 
 
@@ -127,6 +132,7 @@ class SessionService(Base):
 
 
 class Managers(Base):
+    """Class to manage redfish Managers."""
     def __init__(self, url, connection_parameters):
         super(Managers, self).__init__(url, connection_parameters)
         
@@ -149,37 +155,47 @@ class Managers(Base):
 class ManagersCollection(BaseCollection):
     """Class to manage redfish ManagersCollection data."""
     def __init__(self, url, connection_parameters):
+        """Class constructor"""
         super(ManagersCollection, self).__init__(url, connection_parameters)
-        
         self.managers_list = []
-        
         for link in self.links:
             self.managers_list.append(Managers(link, connection_parameters))
-        
-
 
 class Systems(Base):
+    """Class to manage redfish Systems data."""
     # TODO : Need to discuss with Bruno the required method.
     #        Also to check with the ironic driver requirement.
     def __init__(self, url, connection_parameters):
+        """Class constructor"""
         super(Systems, self).__init__(url, connection_parameters)
         self.bios = Bios(url+"Bios/Settings", connection_parameters)
         
     def reset_system(self):
+        """Force reset of the system.
+
+        :returns:  string -- http response of POST request
+        
+        """
         # Craft the request
         action = dict()
         action['Action'] = 'Reset'
         action['ResetType'] = 'ForceRestart'
 
-        # perform the POST action
-        print self.api_url
+        #Debug the url and perform the POST action
+        #print self.api_url
         response = self.api_url.post(verify=self.connection_parameters.verify_cert,
                                      headers={'x-auth-token': self.connection_parameters.auth_token},
                                      data=action
                                     )
         #TODO : treat response.
-        
+        return response
+    
     def get_bios_version(self):
+        """Get bios version of the system.
+
+        :returns:  string -- bios version
+        
+        """
         try:
             # Returned by proliant
             return self.data.Bios.Current.VersionString
@@ -189,6 +205,11 @@ class Systems(Base):
             return self.data.BiosVersion
 
     def get_serial_number(self):
+        """Get serial number of the system.
+
+        :returns:  string -- serial number
+        
+        """
         try:
             # Returned by proliant
             return self.data.SerialNumber
@@ -198,31 +219,56 @@ class Systems(Base):
             return ""
         
     def get_power(self):
+        """Get power status of the system.
+
+        :returns:  string -- power status or NULL if there is an issue
+        
+        """
         try:
             return self.data.Power
         except:
             return ""
         
     def get_parameter(self, parameter_name):
+        """Generic function to get any system parameter
+
+        :param parameter_name: name of the parameter
+        :returns:  string -- parameter value
+        
+        """
         try:
             return self.data[parameter_name]
         except:
             return "Parameter does not exist"
         
     def set_parameter(self, parameter_name, value):
+        """Generic function to set any system parameter
+
+        :param parameter_name: name of the parameter
+        :param value: value to set
+        :returns:   string -- http response of PATCH request
+        
+        """
         # Craft the request
         action = dict()
         action[parameter_name] = value
         print(action)
 
-        # perform the POST action
+        # Perform the POST action
         print self.api_url
         response = self.api_url.patch(verify=self.connection_parameters.verify_cert,
                                      headers={'x-auth-token': self.connection_parameters.auth_token},
                                      data=action
-                                     )     
+                                     )   
+        return response  
         
     def set_parameter_json(self, value):
+        """Generic function to set any system parameter using json structure
+
+        :param value: json structure with value to update
+        :returns:   string -- http response of PATCH request
+        
+        """
         # perform the POST action
         print self.api_url.url()
                 
@@ -243,23 +289,42 @@ class SystemsCollection(BaseCollection):
             self.systems_list.append(Systems(link, connection_parameters))
 
 class Bios(Base):
+    """Class to manage redfish Bios data."""
     def __init__(self, url, connection_parameters):
         super(Bios, self).__init__(url, connection_parameters)
         self.boot = Boot(re.findall(".+/Bios",url)[0]+"/Boot/Settings", connection_parameters)
         
     def get_parameters(self):
+        """Generic function to get all system parameters
+
+        :returns:  string -- parameter value
+        
+        """
         try:
             return self.data
         except:
             return -1
         
     def get_parameter(self, parameter_name):
+        """Generic function to get any system parameter
+
+        :param parameter_name: name of the parameter
+        :returns:  string -- parameter value
+        
+        """
         try:
             return self.data[parameter_name]
         except:
             return "Parameter does not exist"
      
     def set_parameter(self, parameter_name, value):
+        """Generic function to set any bios parameter
+
+        :param parameter_name: name of the parameter
+        :param value: value to set
+        :returns:   string -- http response of PATCH request
+        
+        """
         # Craft the request
         action = dict()
         action[parameter_name] = value
@@ -270,23 +335,44 @@ class Bios(Base):
                                      headers={'x-auth-token': self.connection_parameters.auth_token},
                                      data=action
                                     )
+        return response
+        
 class Boot(Base):
+    """Class to manage redfish Boot data."""
     def __init__(self, url, connection_parameters):
         super(Boot, self).__init__(url, connection_parameters)
         
     def get_parameters(self):
+        """Generic function to get all system parameters
+
+        :returns:  string -- parameter value
+        
+        """
         try:
             return self.data
         except:
             return -1        
     
     def get_parameter(self, parameter_name):
+        """Generic function to get any system parameter
+
+        :param parameter_name: name of the parameter
+        :returns:  string -- parameter value
+        
+        """
         try:
             return self.data[parameter_name]
         except:
             return "Parameter does not exist"
      
     def set_parameter(self, parameter_name, value):
+        """Generic function to set any bios parameter
+
+        :param parameter_name: name of the parameter
+        :param value: value to set
+        :returns:   string -- http response of PATCH request
+        
+        """
         # Craft the request
         action = dict()
         action[parameter_name] = value
@@ -296,8 +382,10 @@ class Boot(Base):
                                      headers={'x-auth-token': self.connection_parameters.auth_token},
                                      data=action
                                     )
+        return response
     
 class EthernetInterfacesCollection(BaseCollection):
+    """Class to manage redfish EthernetInterfacesColkection data."""
     def __init__(self, url, connection_parameters):
         super(EthernetInterfacesCollection, self).__init__(url, connection_parameters)
         
@@ -310,4 +398,5 @@ class EthernetInterfacesCollection(BaseCollection):
             self.ethernet_interfaces_list.append(EthernetInterfaces(link, connection_parameters))
 
 class EthernetInterfaces(Base):
+    """Class to manage redfish EthernetInterfaces data."""
     pass
