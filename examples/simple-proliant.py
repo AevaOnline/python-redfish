@@ -33,7 +33,7 @@ remote_mgmt = redfish.connect(URL, USER_NAME, PASSWORD, verify_cert=False)
 
 print ("Redfish API version : %s \n" % remote_mgmt.get_api_version())
 
-# Uncomment following line to reset the blade !!! 
+# Uncomment following line to reset the blade !!!
 #remote_mgmt.Systems.systems_list[0].reset_system()
 
 # TODO : create an attribute to link the managed system directly
@@ -63,7 +63,8 @@ remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupLocation
 remote_mgmt.Systems.systems_list[0].bios.set_parameter("UefiShellStartupUrl", "http://10.3.222.88/deploy/startup.nsh")
 
 remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideTarget": "UefiShell"}}')
-remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideEnabled" : "Continuous"}}')
+# remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideEnabled" : "Continuous"}}')
+remote_mgmt.Systems.systems_list[0].set_parameter_json('{"Boot": {"BootSourceOverrideEnabled" : "Once"}}')
 
 #Reset of the system is required to apply the changes
 remote_mgmt.Systems.systems_list[0].reset_system()
