@@ -31,8 +31,10 @@ PASSWORD = config["Nodes"]["default"]["password"]
 remote_mgmt = redfish.connect(URL, USER_NAME, PASSWORD,
                              simulator=True, enforceSSL=False)
 
-print ("Redfish API version : {} \n".format(remote_mgmt.get_api_version()))
-print ("UUID : {} \n".format(remote_mgmt.Root.get_api_UUID()))
-print ("Bios version : {}\n".format(remote_mgmt.Systems.systems_list[0].get_bios_version()))
-
+print("Redfish API version : {} \n".format(remote_mgmt.get_api_version()))
+print("UUID : {} \n".format(remote_mgmt.Root.get_api_UUID()))
+print("System 1 :\n")
+print("Bios version : {}\n".format(remote_mgmt.Systems.systems_list[0].get_bios_version()))
+print("System 2 :\n")
+print("Bios version : {}\n".format(remote_mgmt.Systems.systems_list[1].get_parameter("SerialNumber")))
 #print remoteMgmt.get_api_link_to_server()
