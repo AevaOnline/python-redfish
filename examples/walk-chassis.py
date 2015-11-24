@@ -2,8 +2,8 @@
 
 #import logging
 import sys
-from oslo_config import cfg
-from oslo_log import log as logging
+#from oslo_config import cfg
+#from oslo_log import log as logging
 
 import redfish
 
@@ -12,9 +12,9 @@ import redfish
 #log_root.addHandler(logging.StreamHandler(sys.stdout))
 #log_root.setLevel(logging.DEBUG)
 
-CONF = cfg.CONF
-logging.set_defaults(['redfish=DEBUG'])
-logging.register_options(CONF)
+#CONF = cfg.CONF
+#logging.set_defaults(['redfish=DEBUG'])
+#logging.register_options(CONF)
 #logging.setup(CONF, "redfish")
 
 # Connect to a redfish API endpoint

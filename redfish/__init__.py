@@ -12,11 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import pbr.version
+#import pbr.version
 
-import redfish.server
-import redfish.types
+from redfish.main import *
+#import redfish.types
 
 
-__version__ = pbr.version.VersionInfo(
-    'redfish').version_string()
+#__version__ = pbr.version.VersionInfo(
+#    'redfish').version_string()

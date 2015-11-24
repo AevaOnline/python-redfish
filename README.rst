@@ -23,6 +23,7 @@ for build and test automation::
     doc/            # documentation
     doc/source      # the doc source files live here
     doc/build/html  # output of building any docs will go here
+    dmtf            # Reference documents and mockup provided by the DMTF
     examples/       # any sample code using this library, eg. for education
                     # should be put here
     redfish/        # the redfish library
@@ -33,7 +34,7 @@ Requirements
 
 To use the enclosed examples, you will need Python 2.7
 (https://www.python.org/downloads/).  Note that Python 2.7.9 enforces greater
-SSL verification requiring server certificates be installed.  Parameters to
+SSL verification requiring server certificates be installed. Parameters to
 relax the requirements are available in the library, but these configurations
 are discouraged due to security.
 
