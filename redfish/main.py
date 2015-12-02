@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+
 """
 STARTING ASSUMPTIONS
 
@@ -285,6 +286,11 @@ class RedfishConnection(object):
         url = self.Root.get_link_url(
                                     mapping.redfish_mapper.map_sessionservice()
                                     )
+        
+        # Handle login with redfish 1.00, url must be : 
+        # /rest/v1/SessionService/Sessions as specified by the specification
+        if float(mapping.redfish_version) >= 1.00:
+            url += '/Sessions'
 
         # Craft request body and header
         requestBody = {"UserName": self.connection_parameters.user_name  , "Password": self.connection_parameters.password}
@@ -307,7 +313,7 @@ class RedfishConnection(object):
         # TODO : Manage exception with a class.
         # =======================================================================
         if auth.status_code != 201:
-            pass
+            raise exception.AuthenticationFailureException("Login request return an invalid status code")
             #sysraise "Error getting token", auth.status_code
 
         self.connection_parameters.auth_token = auth.headers.get("x-auth-token")

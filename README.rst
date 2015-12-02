@@ -47,6 +47,12 @@ Developer setup
 To initialize a local development environment (eg, so you can run unit tests)
 you should run the following commands::
 
+Contacts
+--------
+
+Distribution list : python-redfish@mondorescue.org
+
+
 
 Further References
 ------------------

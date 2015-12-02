@@ -60,3 +60,7 @@ target/
 .pydevproject
 .settings/
 .metadata
+
+# Vim
+*~
+*.sw?
