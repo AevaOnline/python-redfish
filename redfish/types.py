@@ -1,197 +1,360 @@
-# Copyright 2014 Hewlett-Packard Development Company, L.P.
-#
-# Licensed under the Apache License, Version 2.0 (the "License"); you may
-# not use this file except in compliance with the License. You may obtain
-# a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations
-# under the License.
+# coding=utf-8
 
+import pprint
+from urlparse import urljoin
+import requests
+import tortilla
+import config
+import mapping
+import re
 
-"""
-Redfish Resource Types
-"""
-
-import base64
-import gzip
-import hashlib
-import httplib
-import json
-import ssl
-import StringIO
-import sys
-import urllib2
-from urlparse import urlparse
-
-from oslo_log import log as logging
-from redfish import exception
-
-LOG = logging.getLogger('redfish')
+# Global variable
 
 
 class Base(object):
-    def __init__(self, obj, connection=None):
-        self._conn = connection
-        """handle to the redfish connection"""
+    """Abstract class to manage types (Chassis, Servers etc...)."""
+    def __init__(self, url, connection_parameters):
+        """Class constructor"""
+        global TORTILLADEBUG
+        self.connection_parameters = connection_parameters # Uggly hack to check
+        self.url = url
+        self.api_url = tortilla.wrap(url, debug=config.TORTILLADEBUG)
 
-        self._attrs = []
-        """list of discovered attributes"""
+        try:
+            if connection_parameters.auth_token == None:
+                self.data = self.api_url.get(verify=connection_parameters.verify_cert)
+            else:
+                self.data = self.api_url.get(verify=connection_parameters.verify_cert,
+                                             headers={'x-auth-token': connection_parameters.auth_token}
+                                             )
+        except requests.ConnectionError as e:
+            print e
+            # Log and transmit the exception.
+            config.logger.error("Connection error : %s", e)
+            raise e
+        print self.data
 
-        self._links = []
-        """list of linked resources"""
+    def get_link_url(self, link_type):
+        """Need to be explained.
 
-        # parse the individual resources, appending them to
-        # the list of object attributes
-        for k in obj.keys():
-            ref = k.lower()
-            if ref in ["links", "oem", "items"]:
-                continue
-            setattr(self, ref, obj[k])
-            self._attrs.append(ref)
+        :param redfish_logfile: redfish log
+        :type str
+        :returns:  True
 
-        # make sure the required attributes are present
-        if not getattr(self, 'name', False):
-            raise ObjectLoadException(
-                    "Failed to load object. Reason: could not determine name.")
-        if not getattr(self, 'type', False):
-            raise ObjectLoadException(
-                    "Failed to load object. Reason: could not determine type.")
-
-        if getattr(self, 'serviceversion', False):
-            self.type = self.type.replace('.' + self.serviceversion, '')
-        else:
-            # TODO: use a regex here to strip and store the version
-            # instead of assuming it is 7 chars long
-            self.type = self.type[:-7]
-
-        # Lastly, parse the 'links' resource.
-        # Note that this may have different nested structure, depending on
-        # what type of resource this is, or what vendor it is.
-        # subclasses may follow this by parsing other resources / collections
-        self._parse_links(obj)
-
-    def _parse_links(self, obj):
-        """Map linked resources to getter functions
-
-        The root resource returns a dict of links to top-level resources
         """
-        def getter(connection, href):
-            def _get():
-                return connection.rest_get(href, {})
-            return _get
+        self.links=[]
+        
+        # Manage standard < 1.0
+        if float(mapping.redfish_version) < 1.00:
+            links = getattr(self.data, mapping.redfish_mapper.map_links())
+            if link_type in links:
+                return  urljoin(self.url, links[link_type][mapping.redfish_mapper.map_links_ref()])
+        else:
+            links = getattr(self.data, link_type)
+            link = getattr(links, mapping.redfish_mapper.map_links_ref())
+            return  urljoin(self.url, link)
+        
+    @property
+    def url(self):
+        return self.__url
 
-        for k in obj['links']:
-            ref = "get_" + k.lower()
-            self._links.append(ref)
-            href = obj['links'][k]['href']
-            setattr(self, ref, getter(self._conn, href))
+    @url.setter
+    def url(self, url):
+        self.__url = url
+        
+    def get_parameter(self, parameter_name):
+        """Generic function to get any system parameter
 
-    def __repr__(self):
-        """Return this object's _attrs as a dict"""
-        res = {}
-        for a in self._attrs:
-            res[a] = getattr(self, a)
-        return res
+        :param parameter_name: name of the parameter
+        :returns:  string -- parameter value
+        
+        """
+        try:
+            return self.data[parameter_name]
+        except:
+            return "Parameter does not exist"
+    
+    def get_parameters(self):
+        """Generic function to get all system parameters
 
-    def __str__(self):
-        """Return the string representation of this object's _attrs"""
-        return json.dumps(self.__repr__())
+        :returns:  string -- parameter value
+        
+        """
+        try:
+            return self.data
+        except:
+            return -1
+        
+    def set_parameter(self, parameter_name, value):
+        """Generic function to set any system parameter
 
+        :param parameter_name: name of the parameter
+        :param value: value to set
+        :returns:   string -- http response of PATCH request
+        
+        """
+        # Craft the request
+        action = dict()
+        action[parameter_name] = value
+        print(action)
+
+        # Perform the POST action
+        print self.api_url
+        response = self.api_url.patch(verify=self.connection_parameters.verify_cert,
+                                     headers={'x-auth-token': self.connection_parameters.auth_token},
+                                     data=action
+                                     )   
+        return response  
 
 class BaseCollection(Base):
-    """Base class for collection types"""
-    def __init__(self, obj, connection=None):
-        super(BaseCollection, self).__init__(obj, connection=connection)
-        self._parse_items(obj)
-        self._attrs.append('items')
+    """Abstract class to manage collection (Chassis, Servers etc...)."""
+    def __init__(self, url, connection_parameters):
+        super(BaseCollection, self).__init__(url, connection_parameters)
 
-    def _parse_links(self, obj):
-        """links are special on a chassis; dont parse them"""
-        pass
+        self.links=[]
+        
 
-    def _parse_items(self, obj):
-        """Map linked items to getter methods
+        #linksmembers = self.data.Links.Members
+        #linksmembers = self.data.links.Member
+        if float(mapping.redfish_version) < 1.00:
+            linksmembers = getattr(self.data, mapping.redfish_mapper.map_links())
+            linksmembers = getattr(linksmembers, mapping.redfish_mapper.map_members())
+        else:
+            linksmembers = getattr(self.data, mapping.redfish_mapper.map_members())
+        for link in linksmembers:
+            #self.links.append(getattr(link,"@odata.id"))
+            #self.links.append(getattr(link,"href"))
+            self.links.append(urljoin(self.url, getattr(link, mapping.redfish_mapper.map_links_ref())))
 
-        The chassis resource returns a list of items and corresponding
-        link data in a separate entity.
-        """
-        def getter(connection, href):
-            def _get():
-                return connection.rest_get(href, {})
-            return _get
 
-        self.items = []
-        self._item_getters = []
-
-        if 'links' in obj and 'Member' in obj['links']:
-            # NOTE: this assumes the lists are ordered the same
-            counter = 0
-            for item in obj['links']['Member']:
-                self.items.append(obj['Items'][counter])
-                self._item_getters.append(
-                        getter(self._conn, item['href']))
-                counter+=1
-        elif 'Items' in obj:
-            # TODO: find an example of this format and make sure it works
-            for item in obj['Items']:
-                if 'links' in item and 'self' in item['links']:
-                    href = item['links']['self']['href']
-                    self.items.append(item)
-
-        # TODO: implement paging support
-        # if 'links' in obj and 'NextPage' in obj['links']:
-        #    next_page = THIS_URI + '?page=' + str(obj['links']['NextPage']['page'])
-        #    do something with next_page URI
-
-    def __iter__(self):
-        for getter in self._item_getters:
-            yield getter()
+        print self.links
 
 
 class Root(Base):
-    """Root '/' resource class"""
-    def _parse_links(self, obj):
-        """Map linked resources to getter functions
+    """Class to manage redfish Root data."""
+    def get_api_version(self):
+        """Return api version.
 
-        The root resource returns a dict of links to top-level resources
-
-        TODO: continue implementing customizations for top-level resources
+        :returns:  string -- version
+        :raises: AttributeError
 
         """
-        mapping = {
-                'Systems': Systems,
-                'Chassis': Chassis,
-                'Managers': Base,
-                'Schemas': Base,
-                'Registries': Base,
-                'Tasks': Base,
-                'AccountService': Base,
-                'Sessions': Base,
-                'EventService': Base,
-                }
+        try:
+            version = self.data.RedfishVersion
+        except AttributeError:
+            version = self.data.ServiceVersion
+        
+        version = version.replace('.', '')
+        version = version[0] + '.' + version[1:]
+        return(version)
 
-        def getter(connection, href, type):
-            def _get():
-                return mapping[type](connection.rest_get(href, {}), self._conn)
-            return _get
+    def get_api_UUID(self):
+        """Return UUID version.
 
-        for k in obj['links']:
-            ref = "get_" + k.lower()
-            self._links.append(ref)
-            href = obj['links'][k]['href']
-            setattr(self, ref, getter(self._conn, href, k))
+        :returns:  string -- UUID
+
+        """
+        return self.data.UUID
+
+    def get_api_link_to_server(self):
+        """Return api link to server.
+
+        :returns:  string -- path
+
+        """
+        return getattr(self.root.Links.Systems, "@odata.id")
 
 
-class Chassis(BaseCollection):
-    """Chassis resource class"""
-    def __len__(self):
-        return len(self.items)
+class SessionService(Base):
+    """Class to manage redfish SessionService data."""
+    pass
 
+
+class Managers(Base):
+    """Class to manage redfish Managers."""
+    def __init__(self, url, connection_parameters):
+        super(Managers, self).__init__(url, connection_parameters)
+        try:
+            
+#             self.ethernet_interfaces_collection = EthernetInterfacesCollection(
+#                                                         self.get_link_url("EthernetInterfaces"),
+#                                                         connection_parameters
+#                                                         )
+
+            # Works on proliant, need to treat 095 vs 0.96 differences
+            self.ethernet_interfaces_collection = EthernetInterfacesCollection(
+                                                        self.get_link_url("EthernetNICs"),
+                                                        connection_parameters
+                                                        )
+        except:
+            pass
+        
+    def get_firmware_version(self):
+        """Get bios version of the system.
+
+        :returns:  string -- bios version
+        
+        """
+        try:
+            # Returned by proliant
+            return self.data.FirmwareVersion
+        except:
+            # Returned by mockup.
+            # Hopefully this kind of discrepencies will be fixed with Redfish 1.0 (August)
+            return self.data.FirmwareVersion
+
+class ManagersCollection(BaseCollection):
+    """Class to manage redfish ManagersCollection data."""
+    def __init__(self, url, connection_parameters):
+        """Class constructor"""
+        super(ManagersCollection, self).__init__(url, connection_parameters)
+        self.managers_list = []
+        for link in self.links:
+            self.managers_list.append(Managers(link, connection_parameters))
 
 class Systems(Base):
+    """Class to manage redfish Systems data."""
+    # TODO : Need to discuss with Bruno the required method.
+    #        Also to check with the ironic driver requirement.
+    def __init__(self, url, connection_parameters):
+        """Class constructor"""
+        super(Systems, self).__init__(url, connection_parameters)
+        try:
+            self.bios = Bios(url + "Bios/Settings", connection_parameters)
+        except:
+            pass
+        
+    def reset_system(self):
+        """Force reset of the system.
+
+        :returns:  string -- http response of POST request
+        
+        """
+        # Craft the request
+        action = dict()
+        action['Action'] = 'Reset'
+        action['ResetType'] = 'ForceRestart'
+
+        #Debug the url and perform the POST action
+        #print self.api_url
+        response = self.api_url.post(verify=self.connection_parameters.verify_cert,
+                                     headers={'x-auth-token': self.connection_parameters.auth_token},
+                                     data=action
+                                    )
+        #TODO : treat response.
+        return response
+    
+    def get_bios_version(self):
+        """Get bios version of the system.
+
+        :returns:  string -- bios version
+        
+        """
+        try:
+            # Returned by proliant
+            return self.data.Bios.Current.VersionString
+        except:
+            # Returned by mockup.
+            # Hopefully this kind of discrepencies will be fixed with Redfish 1.0 (August)
+            return self.data.BiosVersion
+
+    def get_serial_number(self):
+        """Get serial number of the system.
+
+        :returns:  string -- serial number
+        
+        """
+        try:
+            # Returned by proliant
+            return self.data.SerialNumber
+        except:
+            # Returned by mockup.
+            # Hopefully this kind of discrepencies will be fixed with Redfish 1.0 (August)
+            return ""
+        
+    def get_power(self):
+        """Get power status of the system.
+
+        :returns:  string -- power status or NULL if there is an issue
+        
+        """
+        try:
+            return self.data.Power
+        except:
+            return ""
+
+    def set_parameter_json(self, value):
+        """Generic function to set any system parameter using json structure
+
+        :param value: json structure with value to update
+        :returns:   string -- http response of PATCH request
+        
+        """
+        # perform the POST action
+        #print self.api_url.url()
+        response = requests.patch(self.api_url.url(),
+                                  verify=self.connection_parameters.verify_cert,
+                                  headers={'x-auth-token': self.connection_parameters.auth_token, 'Content-type': 'application/json'},
+                                  data=value)
+        return response.reason
+        
+    def set_boot_source_override(self, target, enabled):
+        """Shotcut function to set boot source
+
+        :param target: new boot source. Supported values:
+            "None",
+            "Pxe",
+            "Floppy",
+            "Cd",
+            "Usb",
+            "Hdd",
+            "BiosSetup",
+            "Utilities",
+            "Diags",
+            "UefiShell",
+            "UefiTarget"
+        :param enabled: Supported values:
+            "Disabled",
+            "Once",
+            "Continuous"
+        :returns:   string -- http response of PATCH request
+        """      
+        return self.set_parameter_json('{"Boot": {"BootSourceOverrideTarget": "'+target+'"},{"BootSourceOverrideEnabled" : "'+enabled+'"}}')
+
+class SystemsCollection(BaseCollection):
+    """Class to manage redfish ManagersCollection data."""
+    def __init__(self, url, connection_parameters):
+        super(SystemsCollection, self).__init__(url, connection_parameters)
+        
+        self.systems_list = []
+        
+        for link in self.links:
+            self.systems_list.append(Systems(link, connection_parameters))
+
+class Bios(Base):
+    """Class to manage redfish Bios data."""
+    def __init__(self, url, connection_parameters):
+        super(Bios, self).__init__(url, connection_parameters)
+        self.boot = Boot(re.findall(".+/Bios",url)[0]+"/Boot/Settings", connection_parameters)
+
+class Boot(Base):
+    """Class to manage redfish Boot data."""
+    def __init__(self, url, connection_parameters):
+        super(Boot, self).__init__(url, connection_parameters)
+    
+class EthernetInterfacesCollection(BaseCollection):
+    """Class to manage redfish EthernetInterfacesColkection data."""
+    def __init__(self, url, connection_parameters):
+        super(EthernetInterfacesCollection, self).__init__(url, connection_parameters)
+        
+        self.ethernet_interfaces_list = []
+        
+        # Url returned by the mock up is wrong /redfish/v1/Managers/EthernetInterfaces/1 returns a 404.
+        # The correct one should be /redfish/v1/Managers/1/EthernetInterfaces/1
+        # Check more than 1 hour for this bug.... grrr....
+        for link in self.links:
+            self.ethernet_interfaces_list.append(EthernetInterfaces(link, connection_parameters))
+
+class EthernetInterfaces(Base):
+    """Class to manage redfish EthernetInterfaces data."""
     pass

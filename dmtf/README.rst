@@ -3,7 +3,6 @@ DMTF Redfish specification
 
 This directory contains the current references from the DMTF on the Redfish 
 specification (1.0.0 at the time of the writing)
-
 In order to ease test, the DMTF has published a mockup environment to simulate 
 a Redfish based system so it is possible to write programs without real Redfish 
 compliant hardware platform.
