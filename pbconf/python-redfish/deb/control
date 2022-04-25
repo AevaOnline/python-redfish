@@ -1,0 +1,49 @@
+Source: PBPKG
+# http://www.debian.org/doc/debian-policy/ch-archive.html#s-subsections
+Section: PBGRP
+Priority: optional
+Maintainer: PBPACKAGER
+Build-Depends: debhelper (>= 4.2.20), PBBDEP
+Standards-Version: PBDEBSTD
+Vcs-Svn: https://review.openstack.org/p/openstack/PBPROJ.git
+Vcs-Browser: https://review.openstack.org/p/openstack/PBPROJ.git
+Homepage: PBURL
+
+Package: PBPKG
+Architecture: all
+# http://www.debian.org/doc/debian-policy/ch-archive.html#s-subsections
+Section: PBGRP
+Priority: optional
+Depends: ${python:Depends}, PBDEP, python-redfish-data
+X-Python-Version: >= 2.7
+Recommends: PBREC
+Suggests: PBSUG
+Description: PBSUMMARY
+ PBDESC
+ python2 version
+ .
+
+Package: python3-redfish
+Architecture: all
+# http://www.debian.org/doc/debian-policy/ch-archive.html#s-subsections
+Section: PBGRP
+Priority: optional
+Depends: ${python3:Depends}, PBDEP3, python-redfish-data
+X-Python3-Version: >= 3.5
+Recommends: PBREC
+Suggests: PBSUG
+Description: PBSUMMARY
+ PBDESC
+ python3 version
+ .
+
+Package: python-redfish-data
+Architecture: all
+# http://www.debian.org/doc/debian-policy/ch-archive.html#s-subsections
+Section: PBGRP
+Priority: optional
+Description: PBSUMMARY
+ PBDESC
+ Data for PBPKG
+ .
+

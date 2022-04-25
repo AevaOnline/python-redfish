@@ -1,0 +1,7 @@
+#
+# $Id$
+#
+#perl Makefile.PL INSTALLDIRS=vendor
+./configure --prefix=/usr
+make
+make install DESTDIR=\$1

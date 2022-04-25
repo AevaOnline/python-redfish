@@ -1,0 +1,9 @@
+---
+# Specific group for SuSE for python-redfish
+# Cf: http://en.opensuse.org/SUSE_Package_Conventions/RPM_Groups
+#filter PBGRP = Productivity/Archiving/Backup
+#
+# PBLIC is replaced by the license of the application
+# Cf: http://en.opensuse.org/Packaging/SUSE_Package_Conventions/RPM_Style#1.6._License_Tag
+#filter PBLIC = GPL
+#

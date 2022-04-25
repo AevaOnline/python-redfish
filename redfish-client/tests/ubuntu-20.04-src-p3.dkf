@@ -1,0 +1,16 @@
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+apt-get install -y apt-utils && \
+apt-get install -y python3-pip
+COPY python-redfish.src.tar.gz /python-redfish.src.tar.gz
+RUN mkdir /var/log/python-redfish
+RUN tar xvvf python-redfish.src.tar.gz
+# Need a really recent version of setuptools to support
+# configparser>=3.3.0; python_version < '3' in requirements.txt
+# RUN pip install --upgrade setuptools
+RUN cd python-redfish* && \
+pip install -r requirements.txt && \
+python3 setup.py install
+CMD ["/bin/bash"]
+

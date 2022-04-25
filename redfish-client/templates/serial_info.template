@@ -1,0 +1,81 @@
+Redfish API version:  {{ r.get_api_version() }}
+{{ r.Root.get_name() }}
+
+Part|Serial Numbers information:
+================================
+{% for chassis_index in r.Chassis.chassis_dict | sort %}
+{%- set chassis = r.Chassis.chassis_dict[chassis_index] %}
+Chassis #{{ chassis_index }}:
+Name: {{ chassis.get_name() }}
+Manufacturer: {{ chassis.get_manufacturer() }}
+Model: {{ chassis.get_model() }}
+Chassis Type: {{ chassis.get_type() }}
+Part#: {{ chassis.get_part_number() }}
+SKU: {{ chassis.get_sku() }}
+Serial#: {{ chassis.get_serial_number() }}
+AssetTag: {{ chassis.get_asset_tag() }}
+FW version: {{ chassis.get_fw_version() }}
+{%- endfor %}
+
+--------------------------------------------------------------------------------
+{% for system_index in r.Systems.systems_dict | sort %}
+{%- set system = r.Systems.systems_dict[system_index] %}
+System #{{ system_index }}:
+Name: {{ system.get_name() }}
+Type: {{ system.get_type() }}
+Model: {{ system.get_model() }}
+SKU: {{ system.get_sku() }}
+Serial: {{ system.get_serial_number() }}
+FW version: {{ system.get_fw_version() }}
+CPU number: {{ system.get_cpucount() }}
+CPU model: {{ system.get_cpumodel() }}
+Available memory: {{ system.get_memory() }} GB
+Status: State: {{ system.get_status().Health }} / Health: {{ system.get_status().Health }}
+Power: {{ system.get_powerstate() }}
+{%- if system.data.Oem.Hpe or system.data.Oem.Hp %}
+{%- if system.network_adapters_collection %}
+{%- for nic_index in system.network_adapters_collection.network_adapters_dict | sort %}
+	{%- if system.network_adapters_collection.network_adapters_dict[nic_index] %}
+	{%- set na = system.network_adapters_collection.network_adapters_dict[nic_index] %}
+Network Adapter #{{ nic_index }}:
+	Name: {{ na.get_name() }}
+	Mac address:
+	{%- for mac_index in  na.get_mac() | sort %}
+		Mac #{{ loop.index }}: {{ mac_index }}
+	{%- endfor %}
+	Serial#: {{ na.get_serial_number() }}
+	Part#: {{ na.get_part_number() }}
+	FW version: {{ na.get_fw_version() }}
+	{%- endif %}
+{%- endfor %}
+{%- endif %}
+{%- endif %}
+
+{%- if system.data.Oem.Hpe or system.data.Oem.Hp %}
+{%- if system.smart_storage %}
+{%- for ac_index in system.smart_storage.array_controllers_collection.array_controllers_dict | sort %}
+	{%- set ac = system.smart_storage.array_controllers_collection.array_controllers_dict[ac_index] %}
+Array controller #{{ ac_index }}:
+	Model: {{ ac.get_model() }}
+	Serial #: {{ ac.get_serial_number() }}
+	Part #: {{ ac.get_part_number() }}
+	{%- for logical_drives_index in ac.logical_drives_collection.logical_drives_dict | sort %}
+		{%- set ld = ac.logical_drives_collection.logical_drives_dict[logical_drives_index] %}
+	Logical drive #{{ logical_drives_index }}:
+		Capacity: {{ ld.get_capacity() }} MB
+		Raid Level: {{ ld.get_raid() }}
+	{%- endfor %}
+	{%- for physical_drives_index in ac.physical_drives_collection.physical_drives_dict | sort %}
+		{%- set pd = ac.physical_drives_collection.physical_drives_dict[physical_drives_index] %}
+	Physical drive #{{ physical_drives_index }}:
+		{{ pd.get_model() }}
+		Capacity: {{ pd.get_capacity() }} MB
+		Serial #: {{ pd.get_serial_number() }}
+		Part #: {{ pd.get_part_number() }}
+		FW: {{ pd.get_fw_version() }}
+	{%- endfor %}
+{%- endfor %}
+{%- endif %}
+{%- endif %}
+--------------------------------------------------------------------------------
+{% endfor %}

@@ -1,0 +1,7 @@
+etc/
+etc/bash_completion.d/
+usr/share/redfish-client/
+usr/share/redfish-client/templateas/
+usr/share/doc/redfish-client/
+usr/share/doc/redfish-client/manual/
+usr/share/doc/redfish-client/manual/html

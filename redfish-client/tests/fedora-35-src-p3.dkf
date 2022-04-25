@@ -1,0 +1,12 @@
+FROM fedora:35
+RUN dnf install -y python3-pip && \
+dnf install -y tar
+COPY python-redfish.src.tar.gz /python-redfish.src.tar.gz
+RUN mkdir /var/log/python-redfish
+RUN tar xvzf python-redfish.src.tar.gz
+RUN rm python-redfish.src.tar.gz
+RUN cd python-redfish* && \
+pip3 install -r requirements.txt && \
+python3 setup.py install
+CMD ["/bin/bash"]
+

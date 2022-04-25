@@ -1,0 +1,13 @@
+---
+# Specific group for OpenSUSE for python-redfish
+filter:
+  PB2PYTHON3BDEP: python3-Sphinx >= 1.2.3,python3-Sphinx-latex,python3-colorclass,python3-formats
+  PBGRP: Development/Python
+  PBPYTHONDOCBDEP: texlive-latex-bin,texlive-cmap,texlive-fancyhdr,texlive-fancybox,texlive-mdwtools,texlive-parskip,texlive-babel-english,texlive-psnfss,texlive-fncychap,texlive-titlesec,texlive-tabulary,texlive-framed,texlive-fancyvrb,texlive-threeparttable,texlive-float,texlive-wrapfig,texlive-upquote,texlive-capt-of,texlive-multirow,texlive-eqparbox,texlive-metafont-bin,texlive-helvetic,texlive-courier,texlive-dvips,texlive-times
+  PBPYTHON2BDEP: make,python2-devel,python2-setuptools >= 18,python2-future >= 0.15.2,python2-docopt >= 0.6.2,python2-requests >= 2.9.1,python2-simplejson >= 3.8.1,python2-configparser >= 3.3.0,python2-sphinx_rtd_theme,python2-pbr >= 0.8,python-tortilla >= 0.4.1
+  PB2PYTHON2BDEP: python2-Sphinx >= 1.2.3,python2-colorclass,python-formats
+  PBPYTHON3FILTER: perl -pi -e "s|configparser>=3.3.0; python_version < '3'|configparser>=3.3.0|" requirements.txt$/%define py3dir %{_builddir}/python3-%{name}-%{version}-%{release}$/%define __python3 /usr/bin/python3$/%define python3_version %{py3_ver}
+#
+# PBLIC is replaced by the license of the application
+#filter PBLIC = GPL
+#

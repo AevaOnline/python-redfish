@@ -1,0 +1,13 @@
+---
+# Specific group for Mandriva for python-redfish
+# Cf: http://wiki.mandriva.com/en/Development/Packaging/Groups
+filter:
+  PBGRP: Development/Python
+  PB2PYTHON3BDEP: python3-pkg-resources >= 18,python3-sphinx >= 1.2.3
+  PB2PYTHON2BDEP: python-pkg-resources >= 18,python-sphinx >= 1.2.3
+  PBPYTHONDOCBDEP: texlive-dist
+#
+# PBLIC is replaced by the license of the application
+# Cf: http://wiki.mandriva.com/en/Development/Packaging/Licenses
+#filter PBLIC = GPL
+#

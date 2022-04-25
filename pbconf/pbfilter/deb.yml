@@ -1,0 +1,25 @@
+---
+#
+# $Id$
+#
+# Filter for debian build
+#
+# PBGRP is replaced by the group of apps
+filter:
+  PBGRP: utils
+#
+# PBLIC is replaced by the license of the application
+# Cf: http://www.debian.org/legal/licenses/
+  PBLIC: ASL 2.0
+#
+# PBBDEP is replaced by the list of build dependencies
+  PBBDEP: python (>= 2.7), dh-python, python-all, python3-all, python-setuptools, python3-setuptools, python-dev, python-sphinx, python-pbr, python3-pbr, python-future, python3-future, python-simplejson, python3-simplejson, python-tortilla, python3-tortilla, python-docopt, python3-docopt,latexmk,texlive-latex-recommended,texlive-latex-extra,texlive-fonts-recommended
+  PBPYBUILD: --buildsystem=pybuild
+  PBDEP: python-docopt, python-tortilla, python-jinja2, python-pbr, python-simplejson, python-setuptools
+  PBDEP3: python3-docopt, python3-tortilla, python3-jinja2, python3-pbr, python3-simplejson, python3-setuptools
+
+# PBSUG is replaced by the list of suggestions
+#    PBSUG:
+#
+# PBREC is replaced by the list of recommandations
+#    PBREC:

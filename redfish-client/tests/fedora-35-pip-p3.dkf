@@ -1,0 +1,6 @@
+FROM fedora:35
+RUN dnf install -y python-pip
+RUN mkdir /var/log/python-redfish
+RUN pip install python-redfish --pre
+CMD ["/bin/bash"]
+

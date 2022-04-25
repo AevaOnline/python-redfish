@@ -1,0 +1,16 @@
+Usage:
+  check_cartridge [options] <manager_name>
+  check_cartridge (-h | --help)
+  check_cartridge --version
+
+
+Options:
+  -h --help            Show this screen.
+  --version            Show version.
+  -c --config FILE     Configuration file
+  -i --inventory FILE  Configuration file [default: $HOME/.redfish/inventory]
+  --insecure           Ignore SSL certificates
+  --debug LEVEL        Run in debug mode, LEVEL from 1 to 3 increase verbosity
+                       Security warning LEVEL > 1 could reveal password into the logs
+  --debugfile FILE     Specify the client debugfile [default: $HOME/.redfish/check_cartridge.log]
+  --libdebugfile FILE  Specify python-redfish library log file [default: $HOME/.redfish/python-redfish.log]

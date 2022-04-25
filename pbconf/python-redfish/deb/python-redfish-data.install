@@ -1,0 +1,7 @@
+redfish-client/templates/* usr/share/python-redfish/templates/
+redfish-client/*.txt usr/share/python-redfish/
+redfish-client/etc/redfish-client.conf etc/
+./redfish-client/etc/bash_completion.d/redfish-client.bash etc/bash_completion.d/
+doc/build/singlehtml/_static/* usr/share/doc/python-redfish/manual/html/_static/
+doc/build/singlehtml/* usr/share/doc/python-redfish/manual/html/
+doc/build/latex/*.pdf usr/share/doc/python-redfish/manual/

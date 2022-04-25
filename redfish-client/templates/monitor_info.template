@@ -1,0 +1,47 @@
+Redfish API version:  {{ r.get_api_version() }}
+{{ r.Root.get_name() }}
+
+Monitoring
+==========
+{% for chassis_index in r.Chassis.chassis_dict | sort %}
+{%- set chassis = r.Chassis.chassis_dict[chassis_index] %}
+Chassis #{{ chassis_index }}:
+Name: {{ chassis.get_name() }}
+Power: {{ chassis.get_powerstate() }}
+Temperatures :
+{%- if chassis.thermal.get_temperatures() == 'Not available' %}
+    Not available
+{%- else %}
+{%- for sensor, temp in chassis.thermal.get_temperatures().items() | sort %}
+    {{ sensor }} : {{ temp }}
+{%- endfor %}
+{%- endif %}
+Fans :
+{%- if chassis.thermal.get_fans() == 'Not available' %}
+    Not available
+{%- else %}
+{%- for fan, rpm in chassis.thermal.get_fans().items() | sort %}
+    {{ fan }} : {{ rpm }}
+{%- endfor %}
+{%- endif %}
+Power control :
+{%- if chassis.power.get_power() == 'Not available' %}
+    Not available
+{%- else %}
+{%- for ps, volt in chassis.power.get_power().items() | sort %}
+    {{ ps }} : {{ volt }}
+{%- endfor %}
+{%- endif %}
+{%- endfor %}
+
+--------------------------------------------------------------------------------
+{% for system_index in r.Systems.systems_dict | sort %}
+{%- set system = r.Systems.systems_dict[system_index] %}
+System #{{ system_index }}:
+Name: {{ system.get_name() }}
+CPU number: {{ system.get_cpucount() }}
+CPU model: {{ system.get_cpumodel() }}
+Status: State: {{ system.get_status().Health }} / Health: {{ system.get_status().Health }}
+
+--------------------------------------------------------------------------------
+{% endfor %}

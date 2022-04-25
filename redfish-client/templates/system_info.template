@@ -1,0 +1,108 @@
+Redfish API version :  {{ r.get_api_version() }}
+{{ r.Root.get_name() }}
+
+Systems information :
+=====================
+{% for system_index in r.Systems.systems_dict | sort %}
+{%- set system = r.Systems.systems_dict[system_index] %}
+System id {{ system_index }}:
+UUID : {{ system.get_uuid() }}
+Type : {{ system.get_type() }}
+Manufacturer : {{ system.get_manufacturer() }}
+Model : {{ system.get_model() }}
+SKU : {{ system.get_sku() }}
+Serial : {{ system.get_serial_number() }}
+Hostname : {{ system.get_hostname() }}
+Bios version : {{ system.get_bios_version() }}
+CPU number : {{ system.get_cpucount() }}
+CPU model : {{ system.get_cpumodel() }}
+
+{%- if system.processors_collection %}
+CPU details :
+    {%- for cpu_index in system.processors_collection.processors_dict | sort %}
+    {%- set cpu = system.processors_collection.processors_dict[cpu_index] %}
+    Processor id {{ cpu_index }} :
+    Speed : {{ cpu.get_speed() }}
+    Cores : {{ cpu.get_cores() }}
+    Threads : {{ cpu.get_threads() }}
+    {% endfor %}
+{%- endif %}
+Available memory : {{ system.get_memory() }} GB
+Status : State : {{ system.get_status().Health }} / Health : {{ system.get_status().Health }}
+Power : {{ system.get_powerstate() }}
+Description : {{ system.get_description() }}
+Chassis : {{ system.get_chassis() | join(', ') }}
+Managers : {{ system.get_managers() | join(', ') }}
+IndicatorLED : {{ system.get_indicatorled() }}
+
+Ethernet Interface :
+{%- if system.ethernet_interfaces_collection %}
+{%- for ethernetinterface_index in system.ethernet_interfaces_collection.ethernet_interfaces_dict | sort %}
+{%- set ei = system.ethernet_interfaces_collection.ethernet_interfaces_dict[ethernetinterface_index] %}
+    Ethernet Interface id {{ ethernetinterface_index }} :
+    {{ ei.get_name() }}
+    FQDN : {{ ei.get_fqdn() }}
+    Mac address : {{ ei.get_mac() }}
+    Address ipv4 : {{ ei.get_ipv4() | join(', ') }}
+    Address ipv6 : {{ ei.get_ipv6() | join(', ') }}
+{%- endfor %}
+{%- else %}
+    This system has no ethernet interface as Redfish standard data
+{%- endif %}
+Looking for potential OEM information :
+{%- if system.data.Oem.Hpe or system.data.Oem.Hp %}
+    Supplemental information from HPE OEM part.
+    {%- if system.network_adapters_collection %}
+    {%- for networkadapter_index in system.network_adapters_collection.network_adapters_dict | sort %}
+    {%- set na = system.network_adapters_collection.network_adapters_dict[networkadapter_index] %}
+    Network adapter id {{ networkadapter_index }} :
+        {{ na.get_name() }}
+        {#- Removing these information because the FW is not providing them correctly
+        {{ na.get_structured_name() }}
+        {{ na.get_uefi_path() }}
+        #}
+        Mac address : {{ na.get_mac() | join(', ') }}
+    {%- endfor %}
+    {%- endif %}
+{%- else %}
+    This system has no supplemental OEM information
+{%- endif %}
+
+
+Simple Storage :
+{%- if system.simple_storage_collection %}
+{%- for simplestorage_index in system.simple_storage_collection.simple_storage_dict | sort %}
+{%- set ss = system.simple_storage_collection.simple_storage_dict[simplestorage_index] %}
+    Simple Storage id {{ simplestorage_index }} :
+    {{ ss.get_name() }}
+    Status : State : {{ system.get_status().Health }} / Health : {{ system.get_status().Health }}
+    {%- for dev in ss.get_devices() %}
+    Device id {{ loop.index }} : {{ dev.Name }}  {{ dev.Manufacturer }}  {{ dev.Model }}
+    {%- endfor %}
+{%- endfor %}
+{%- else %}
+    This system has no simple storage as Redfish standard data
+{%- endif %}
+Looking for potential OEM information :
+{%- if system.data.Oem.Hpe or system.data.Oem.Hp %}
+    Supplemental information from HPE OEM part.
+    {%- if system.smart_storage %}
+    {%- for array_controllers_index in system.smart_storage.array_controllers_collection.array_controllers_dict | sort %}
+    {%- set ac = system.smart_storage.array_controllers_collection.array_controllers_dict[array_controllers_index] %}
+    Array controller id {{ array_controllers_index }} :
+        {{ ac.get_name() }}
+        {%- for logical_drives_index in ac.logical_drives_collection.logical_drives_dict | sort %}
+        {%- set ld = ac.logical_drives_collection.logical_drives_dict[logical_drives_index] %}
+        Logical drive id {{ logical_drives_index }} :
+        {{ ld.get_name() }}
+        Status : State : {{ ld.get_status().Health }} / Health : {{ ld.get_status().Health }}
+        Capacity : {{ ld.get_capacity() }} MB
+        Raid : {{ ld.get_raid() }}
+        {%- endfor %}
+    {%- endfor %}
+    {%- endif %}
+{%- else %}
+    This system has no supplemental OEM information
+{%- endif %}
+--------------------------------------------------------------------------------
+{% endfor %}

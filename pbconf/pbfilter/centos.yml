@@ -1,0 +1,35 @@
+---
+#
+# $Id$
+#
+# Filter for rpm build
+#
+#
+# PBGRP is replaced by the RPM group of apps
+# Cf: http://fedoraproject.org/wiki/RPMGroups
+#filter PBGRP = Applications/Archiving
+#
+# PBLIC is replaced by the license of the application
+# Cf: http://fedoraproject.org/wiki/Licensing
+#filter PBLIC = GPLv2+
+#
+# PBDEP is replaced by the list of dependencies
+#filter PBDEP =
+#
+# PBBDEP is replaced by the list of build dependencies
+#filter PBBDEP =
+#
+# PBSUF is replaced by the package suffix ($pb->{'suf'} in code)
+filter:
+  PBPYTHONDOCBDEP: python2-sphinx-theme-alabaster,python-snowballstemmer,texlive-multirow,texlive-upquote,texlive-wrapfig,texlive-threeparttable,texlive-titlesec,texlive-framed,,texlive-latex-bin,texlive-hyphen-base,texlive-cm,texlive-cmap,texlive-ec,texlive-fancyhdr,texlive-fancybox,texlive-mdwtools,texlive-parskip
+  PBPYTHON3BDEP: !!str ""
+  PB2PYTHON2BDEP: python-sphinx >= 1.2.3
+  PBPYTHON3DEP: !!str ""
+  PBSUF: %{dist}
+  PBWITHPY3: 0
+  PB2PYTHON3BDEP: python3-sphinx >= 1.2.3
+#
+# PBOBS is replaced by the Obsolete line
+#filter PBOBS =
+#
+# Needed as pb doesn't interpret spec macros

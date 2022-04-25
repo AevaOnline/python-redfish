@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Script to rebuild all packages for supported distros in containers using
+# project-builder.org
+#
+PRJ=python-redfish
+PKG=`pbgetparam -p $PRJ velist | sed 's/,/ /'`
+if [ _"$1" != _"" ]; then
+    PKG=$*
+fi
+for i in $PKG; do
+    DISTRO=`echo $i | cut -d- -f1`
+    DISTROVER=`echo $i | cut -d- -f2`
+
+    M=$DISTRO-$DISTROVER-x86_64
+
+    pb -p pb -T docker -m $M --stop-on-error newve -i ${DISTRO}:$DISTROVER
+    pb -p pb -T docker -m $M --stop-on-error setupve
+    pb -p $PRJ -T docker -m $M --stop-on-error sbx2prepve
+    pb -p $PRJ -T docker -m $M --stop-on-error build2ve
+done

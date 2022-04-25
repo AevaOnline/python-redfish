@@ -12,11 +12,21 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
 import pbr.version
 
-import redfish.server
-import redfish.types
+from redfish.main import connect  # noqa: F401
+standard_library.install_aliases()
 
-
-__version__ = pbr.version.VersionInfo(
-    'redfish').version_string()
+try:
+    __version__ = pbr.version.VersionInfo('redfish').release_string()
+except Exception as e:
+    if "Versioning for this project requires either an sdist tarball" \
+       in e.args[0]:
+        pass
+    else:
+        raise

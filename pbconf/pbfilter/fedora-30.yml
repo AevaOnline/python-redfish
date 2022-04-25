@@ -1,0 +1,31 @@
+---
+#
+# $Id$
+#
+# Filter for rpm build
+#
+#
+# PBGRP is replaced by the RPM group of apps
+# Cf: http://fedoraproject.org/wiki/RPMGroups
+#filter PBGRP = Applications/Archiving
+#
+# PBLIC is replaced by the license of the application
+# Cf: http://fedoraproject.org/wiki/Licensing
+#filter PBLIC = GPLv2+
+#
+# PBDEP is replaced by the list of dependencies
+#filter PBDEP =
+#
+# PBBDEP is replaced by the list of build dependencies
+#filter PBBDEP =
+#
+# PBSUF is replaced by the package suffix ($pb->{'suf'} in code)
+filter:
+  PBPYTHONDOCBDEP: texlive-multirow,texlive-upquote,texlive-wrapfig,texlive-threeparttable,texlive-titlesec,texlive-framed,texlive-capt-of,texlive-latex-bin,texlive-hyphen-base,texlive-cm,texlive-cmap,texlive-ec,texlive-langcode,texlive-babel-english,texlive-fancyhdr,texlive-fancybox,texlive-mdwtools,texlive-parskip,texlive-eqparbox,texlive-times,texlive-helvetic,texlive-courier,texlive-gsftopk-bin,texlive-dvips,texlive-mfware-bin,latexmk,texlive-fncychap,texlive-tabulary,texlive-needspace,texlive-helvetic,texlive-updmap-map,texlive-makeindex
+  PB2PYTHON2BDEP: python-sphinx >= 1.2.3
+  PB2PYTHON3BDEP: python3-sphinx >= 1.2.3
+  PBSUF: %{dist}
+#
+# PBOBS is replaced by the Obsolete line
+#filter PBOBS =
+#

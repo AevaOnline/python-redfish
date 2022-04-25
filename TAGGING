@@ -1,0 +1,4 @@
+In order to publish automatically a new version to pypi, there is a need to tag correctly the commit before review:
+
+git tag -asm "Official version x.y.z" x.y.z
+git review

@@ -1,0 +1,11 @@
+--- /var/www/html/redfish/Managers/1/EthernetInterfaces/1/index.html	2016-05-28 13:09:32.028645250 +0000
++++ /var/www/html/redfish/Managers/1/EthernetInterfaces/1/index.html.patched	2016-05-28 13:21:19.826186341 +0000
+@@ -67,7 +67,7 @@
+         ]
+     },
+     "@Redfish.Settings": {
+-        "@odata.type": "#Settings.1.0.0.Settings"
++        "@odata.type": "#Settings.1.0.0.Settings",
+         "SettingsObject": {
+             "@odata.id": "/redfish/v1/Managers/1/EthernetInterfaces/1/SD"
+         },

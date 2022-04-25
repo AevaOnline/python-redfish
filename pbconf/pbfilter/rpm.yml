@@ -1,0 +1,36 @@
+---
+#
+# $Id$
+#
+# Filter for rpm build
+#
+#
+# PBGRP is replaced by the RPM group of apps
+filter:
+  PBPYTHON3BDEP: python3-devel,python3-setuptools >= 18,python3-future >= 0.15.2,python3-docopt >= 0.6.2,python3-requests >= 2.9.1,python3-simplejson >= 3.8.1,python3-sphinx_rtd_theme,python3-pbr >= 0.8,python3-tortilla >= 0.4.1
+  PBPYTHON2BDEP: make,python-devel,python2-setuptools >= 18,python-future >= 0.15.2,python-docopt >= 0.6.2,python-requests >= 2.9.1,python-simplejson >= 3.8.1,python-configparser >= 3.3.0,python-sphinx_rtd_theme,python-pbr >= 0.8,python-tortilla >= 0.4.1
+  PBPYTHON3DEP: python3-docopt >= 0.6.2,python3-tortilla >= 0.4.1,python3-jinja2 >= 2.7.3,python3-simplejson >= 3.8.1,python3-requests >= 2.9.1,python3-future >= 0.15.2,python3-pbr >= 0.8,python3-pbr <= 2.0
+  PBPYTHON2DEP: python-docopt >= 0.6.2,python-tortilla >= 0.4.1,python-jinja2 >= 2.7.3,python-simplejson >= 3.8.1,python-requests >= 2.9.1,python-configparser >= 3.3.0,python-future >= 0.15.2,python-pbr >= 0.8
+  PBPYTHONDOCBDEP: texlive
+  PBPYTHON3PKG: python3-redfish
+  PBGRP: Applications/System
+  PBSUF: $pb->{'suf'}
+  PBLIC: ASL 2.0
+#
+# PBLIC is replaced by the license of the application
+#
+# PBDEP is replaced by the list of dependencies
+#filter PBDEP =
+#
+# PBBDEP is replaced by the list of build dependencies
+#
+# PBSUF is replaced by the package suffix ($pb->{'suf'} in code)
+#
+# PBOBS is replaced by the Obsolete line
+#filter PBOBS =
+#
+# transform a variable from the key on the right to the key on the left using the perl expression
+# after the input key name.  Useful for taking multi-line documentation and removing trailing spaces
+# or leading spaces.
+#transform PBDESC = PBDESC_raw s/\s+\n/\n/go;
+#

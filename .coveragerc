@@ -1,7 +1,8 @@
 [run]
 branch = True
 source = redfish
-omit = redfish/tests/*,redfish/openstack/*
+		 redfish-client
+omit = redfish/tests/*,redfish-client/tests/*
 
 [report]
-ignore-errors = True
+#ignore-errors = True

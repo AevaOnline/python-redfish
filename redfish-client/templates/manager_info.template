@@ -1,0 +1,32 @@
+Redfish API version :  {{ r.get_api_version() }}
+{{ r.Root.get_name() }}
+
+Managers information :
+======================
+{% for manager_index in r.Managers.managers_dict | sort %}
+{%- set manager = r.Managers.managers_dict[manager_index] %}
+Manager id {{ manager_index }}:
+UUID : {{ manager.get_uuid() }}
+Type : {{ manager.get_type() }}
+Firmware version : {{ manager.get_firmware_version() }}
+Status : State : {{ manager.get_status().Health }} / Health : {{ manager.get_status().Health }}
+Ethernet Interface :
+{%- if manager.ethernet_interfaces_collection %}
+{%- for ethernetinterface_index in manager.ethernet_interfaces_collection.ethernet_interfaces_dict | sort %}
+{%- set ei = manager.ethernet_interfaces_collection.ethernet_interfaces_dict[ethernetinterface_index] %}
+    Ethernet Interface id {{ ethernetinterface_index }} :
+    {{ ei.get_name() }}
+    FQDN : {{ ei.get_fqdn() }}
+    Mac address : {{ ei.get_mac() }}
+    Address ipv4 : {{ ei.get_ipv4() | join(', ') }}
+    Address ipv6 : {{ ei.get_ipv6() | join(', ') }}
+{%- endfor %}
+{%- else %}
+    This manager has no ethernet interface
+{%- endif %}
+Managed Chassis :
+	{{ manager.get_managed_chassis() | join(', ') }}
+Managed System :
+	{{ manager.get_managed_systems() | join(', ') }}
+----------------------------
+{% endfor %}
